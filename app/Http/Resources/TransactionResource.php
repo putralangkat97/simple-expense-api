@@ -21,6 +21,7 @@ class TransactionResource extends JsonResource
             'type' => $this->type,
             'remarks' => $this->remarks,
             'amount' => $this->amount,
+            'account' => new AccountResource($this->account),
         ];
     }
 }
