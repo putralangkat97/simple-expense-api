@@ -18,6 +18,6 @@ class Account extends Model
 
     public function scopeAccountUser($query, $value)
     {
-        return $query->where('id', $value);
+        return $query->where('user_id', $value);
     }
 }
