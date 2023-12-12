@@ -41,8 +41,13 @@ class AccountController extends Controller
     public function transactionByAccount(string|int $id)
     {
         $current_user = Auth::user();
-        return new AccountTransactionResource(
+        $account = new AccountTransactionResource(
             Account::accountUser($current_user->id)->where('id', $id)->first()
+        );
+
+        return $this->successResponse(
+            message: "Account detail",
+            data: $account,
         );
     }
 
