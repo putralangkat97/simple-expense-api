@@ -46,21 +46,19 @@ class TransactionController extends Controller
         if ($validated) {
             DB::beginTransaction();
             try {
-                $amount = $validated['amount'];
                 $transaction = $id ? Transaction::findOrFail($id) : new Transaction();
                 $transaction->transaction_name = $validated['transaction_name'];
-                $transaction->amount = $amount;
                 $transaction->date = $validated['date'];
                 $transaction->type = $validated['type'];
                 $transaction->remarks = $validated['remarks'] ?? null;
                 $transaction->account_id = $validated['account_id'];
                 $transaction->user_id = Auth::user()->id;
-                $transaction->save();
 
                 $account = $this->createTransaction(
                     $validated['account_id'],
-                    $amount,
-                    $validated['type']
+                    $validated['amount'],
+                    $validated['type'],
+                    $transaction
                 );
                 if (!$account) {
                     return $this->failedResponse(
@@ -68,6 +66,8 @@ class TransactionController extends Controller
                         status_code: 400,
                     );
                 }
+                $transaction->amount = $validated['amount'];
+                $transaction->save();
                 DB::commit();
 
                 $message = $id ? "updated" : "created";
