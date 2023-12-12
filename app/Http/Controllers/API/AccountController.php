@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AccountRequest;
 use App\Http\Resources\AccountResource;
+use App\Http\Resources\AccountTransactionResource;
 use App\Models\Account;
 use App\Traits\APIResponse;
 use Illuminate\Support\Facades\Auth;
@@ -34,6 +35,14 @@ class AccountController extends Controller
         return $this->successResponse(
             message: $id ? "Account detail" : "Account lists",
             data: $account,
+        );
+    }
+
+    public function transactionByAccount(string|int $id)
+    {
+        $current_user = Auth::user();
+        return new AccountTransactionResource(
+            Account::accountUser($current_user->id)->where('id', $id)->first()
         );
     }
 

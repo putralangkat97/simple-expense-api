@@ -20,6 +20,7 @@ Route::middleware(['auth:sanctum'])
             ->group(function () {
                 Route::get('/', 'index');
                 Route::get('/{id}', 'index');
+                Route::get('/{id}/transaction', 'transactionByAccount');
                 Route::post('/', 'submit');
                 Route::post('/{id}', 'submit');
                 Route::delete('/{id}', 'delete');

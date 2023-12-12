@@ -16,6 +16,11 @@ class Account extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
     public function scopeAccountUser($query, $value)
     {
         return $query->where('user_id', $value);
