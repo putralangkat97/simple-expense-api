@@ -22,7 +22,9 @@ class TransactionController extends Controller
         $transaction = $id ? new TransactionResource(
             Transaction::transactionUser($current_user->id)->where('id', $id)->first()
         ) : TransactionResource::collection(
-            Transaction::transactionUser($current_user->id)->get()
+            Transaction::transactionUser($current_user->id)
+                ->orderBy('id', 'desc')
+                ->get()
         );
 
         if (is_null($transaction->resource)) {
