@@ -9,6 +9,7 @@ use App\Http\Resources\AccountTransactionResource;
 use App\Models\Account;
 use App\Traits\APIResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -20,9 +21,13 @@ class AccountController extends Controller
     {
         $current_user = Auth::user();
         $account = $id ? new AccountResource(
-            Account::accountUser($current_user->id)->where('id', $id)->first()
+            Cache::remember('account-' . $id, 60*15, function () use ($current_user, $id) {
+                return Account::accountUser($current_user->id)->where('id', $id)->first();
+            })
         ) : AccountResource::collection(
-            Account::accountUser($current_user->id)->get()
+            Cache::remember('accounts', 60*15, function () use ($current_user) {
+                return Account::accountUser($current_user->id)->get();
+            })
         );
 
         if (is_null($account->resource)) {
@@ -42,7 +47,9 @@ class AccountController extends Controller
     {
         $current_user = Auth::user();
         $account = new AccountTransactionResource(
-            Account::accountUser($current_user->id)->where('id', $id)->first()
+            Cache::remember('account-' . $id, 60*15, function () use ($current_user, $id) {
+                return Account::accountUser($current_user->id)->where('id', $id)->first();
+            })
         );
 
         return $this->successResponse(

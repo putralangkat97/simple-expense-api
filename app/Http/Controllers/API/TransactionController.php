@@ -9,6 +9,7 @@ use App\Models\Transaction;
 use App\Traits\AccountTrait;
 use App\Traits\APIResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -20,11 +21,15 @@ class TransactionController extends Controller
     {
         $current_user = Auth::user();
         $transaction = $id ? new TransactionResource(
-            Transaction::transactionUser($current_user->id)->where('id', $id)->first()
+            Cache::remember('transaction-' . $id, 60 * 15, function () use ($current_user, $id) {
+                return Transaction::transactionUser($current_user->id)->where('id', $id)->first();
+            })
         ) : TransactionResource::collection(
-            Transaction::transactionUser($current_user->id)
-                ->orderBy('id', 'desc')
-                ->get()
+            Cache::remember('transactions', 60 * 15, function () use ($current_user) {
+                return Transaction::transactionUser($current_user->id)
+                    ->orderBy('id', 'desc')
+                    ->get();
+            })
         );
 
         if (is_null($transaction->resource)) {
